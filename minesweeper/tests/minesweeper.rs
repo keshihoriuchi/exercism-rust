@@ -27,7 +27,6 @@ fn no_rows() {
 }
 
 #[test]
-#[ignore]
 fn no_columns() {
     run_test(&[
         "",
@@ -35,7 +34,6 @@ fn no_columns() {
 }
 
 #[test]
-#[ignore]
 fn no_mines() {
     run_test(&[
         "   ",
@@ -45,7 +43,6 @@ fn no_mines() {
 }
 
 #[test]
-#[ignore]
 fn board_with_only_mines() {
     run_test(&[
         "***",
@@ -55,7 +52,6 @@ fn board_with_only_mines() {
 }
 
 #[test]
-#[ignore]
 fn mine_surrounded_by_spaces() {
     run_test(&[
         "111",
@@ -65,7 +61,6 @@ fn mine_surrounded_by_spaces() {
 }
 
 #[test]
-#[ignore]
 fn space_surrounded_by_mines() {
     run_test(&[
         "***",
@@ -75,7 +70,6 @@ fn space_surrounded_by_mines() {
 }
 
 #[test]
-#[ignore]
 fn horizontal_line() {
     run_test(&[
         "1*2*1",
@@ -83,7 +77,6 @@ fn horizontal_line() {
 }
 
 #[test]
-#[ignore]
 fn horizontal_line_mines_at_edges() {
     run_test(&[
         "*1 1*",
@@ -91,7 +84,6 @@ fn horizontal_line_mines_at_edges() {
 }
 
 #[test]
-#[ignore]
 fn vertical_line() {
     run_test(&[
         "1",
@@ -103,7 +95,6 @@ fn vertical_line() {
 }
 
 #[test]
-#[ignore]
 fn vertical_line_mines_at_edges() {
     run_test(&[
         "*",
@@ -115,7 +106,6 @@ fn vertical_line_mines_at_edges() {
 }
 
 #[test]
-#[ignore]
 fn cross() {
     run_test(&[
         " 2*2 ",
@@ -127,7 +117,6 @@ fn cross() {
 }
 
 #[test]
-#[ignore]
 fn large_board() {
     run_test(&[
         "1*22*1",
