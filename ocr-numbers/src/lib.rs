@@ -18,21 +18,23 @@ pub fn convert(input: &str) -> Result<String, Error> {
             v
         });
 
-    if images[0].len() % 4 != 0 {
-        return Err(Error::InvalidRowCount(images[0].len()));
-    }
-
-    let col_len = images[0][0].chars().collect::<Vec<char>>().len();
-    if col_len % 3 != 0 {
-        return Err(Error::InvalidColumnCount(col_len));
-    }
-
     // Ex. results = ["123", "456", "789"]
     let mut results = Vec::new();
     for rows in images {
+        // validate row count
+        if rows.len() % 4 != 0 {
+            return Err(Error::InvalidRowCount(rows.len()));
+        }
+
         // Ex. ocr_strs = [" _ | ||_|   ", "     |  |   "]
         let mut ocr_strs: Vec<String> = Vec::new();
         for (i, row) in rows.iter().enumerate() {
+            // validate column count
+            let col_len = (*row).chars().count();
+            if col_len % 3 != 0 {
+                return Err(Error::InvalidColumnCount(col_len));
+            }
+
             for (j, c) in (*row).chars().enumerate() {
                 if i == 0 && j % 3 == 0 {
                     let mut s = String::with_capacity(12);
@@ -45,9 +47,9 @@ pub fn convert(input: &str) -> Result<String, Error> {
         }
 
         // Ex. result = "123"
-        let mut result = String::new();
-        for s in ocr_strs {
-            let c = match s.as_ref() {
+        let result: String = ocr_strs
+            .iter()
+            .map(|s| match s.as_ref() {
                 " _ | ||_|   " => '0',
                 "     |  |   " => '1',
                 " _  _||_    " => '2',
@@ -59,12 +61,12 @@ pub fn convert(input: &str) -> Result<String, Error> {
                 " _ |_||_|   " => '8',
                 " _ |_| _|   " => '9',
                 _ => '?',
-            };
-            result.push(c)
-        }
+            })
+            .collect();
         results.push(result)
     }
 
+    // Ex. result = "123,456,789"
     let result = results
         .iter()
         .enumerate()
