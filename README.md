@@ -9,3 +9,4 @@ https://exercism.io/my/tracks/rust
 3. [sieve](./sieve/src/lib.rs)
 4. [minesweeper](./minesweeper/src/lib.rs)
 5. [ocr-numbers](./ocr-numbers/src/lib.rs)
+6. [simple-linked-list](./simple-linked-list/src/lib.rs)
