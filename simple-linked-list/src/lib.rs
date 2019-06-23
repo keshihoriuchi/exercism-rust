@@ -66,14 +66,11 @@ impl<T> SimpleLinkedList<T> {
         loop {
             if let Some(box_node) = some_box_node {
                 if let None = (*box_node).next {
-                    let mut result_node = None;
-                    std::mem::swap(&mut result_node, &mut some_box_node);
+                    let result_node = std::mem::replace(some_box_node, None);
                     return Some((*(result_node.unwrap())).data);
                 }
             }
-            // 上のif let式中でmatchでNoneとSomeで分岐させると、
-            // some_box_nodeへの代入でなぜかmut借用エラーになる。
-            // よってここでif let式からやり直す
+            // 上のif let式中でmatchでNoneとSomeで分岐させると、some_box_nodeへの代入でなぜかmut借用エラーになる。よってここでif let式からやり直す
             if let Some(box_node) = some_box_node {
                 some_box_node = &mut (*box_node).next
             }
@@ -81,16 +78,15 @@ impl<T> SimpleLinkedList<T> {
     }
 
     pub fn pop_front(&mut self) -> Option<T> {
-        let mut next_some_box_node = None;
+        let mut next_some_box_node;
         match &mut self.head {
             None => return None,
             Some(ref mut box_node) => {
                 let node: &mut Node<T> = &mut (*box_node);
-                std::mem::swap(&mut next_some_box_node, &mut node.next);
+                next_some_box_node = std::mem::replace(&mut node.next, None);
             }
         }
-        let mut result = None;
-        std::mem::swap(&mut self.head, &mut result);
+        let result = std::mem::replace(&mut self.head, None);
         self.head = next_some_box_node;
         Some((*(result.unwrap())).data)
     }
@@ -118,25 +114,17 @@ impl<T: Clone> SimpleLinkedList<T> {
         if let None = &self.head {
             return list;
         }
-        let mut temp_list: SimpleLinkedList<T> = SimpleLinkedList::new();
         let mut some_box_node: &Option<Box<Node<T>>> = &self.head;
         loop {
             if let Some(box_node) = some_box_node {
                 let node = &(*box_node);
-                temp_list.push(node.data.clone());
+                list.push_front(node.data.clone());
                 match &node.next {
-                    None => break,
-                    Some(_) => some_box_node = &node.next 
+                    None => return list,
+                    Some(_) => some_box_node = &node.next,
                 }
             }
         }
-        loop {
-            match temp_list.pop_front() {
-                None => break,
-                Some(v) => list.push_front(v)
-            }
-        }
-        list
     }
 }
 
