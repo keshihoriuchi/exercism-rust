@@ -25,6 +25,7 @@ impl<T> SimpleLinkedList<T> {
         panic!("never here")
     }
 
+    // push_back
     pub fn push(&mut self, element: T) {
         let mut some_box_node: &mut Option<Box<Node<T>>> = &mut self.head;
         loop {
@@ -42,6 +43,23 @@ impl<T> SimpleLinkedList<T> {
         }
     }
 
+    pub fn push_front(&mut self, element: T) {
+        let mut some_box_node = Some(Box::new(Node {
+            data: element,
+            next: None,
+        }));
+        if let None = &self.head {
+            self.head = some_box_node;
+            return;
+        }
+        std::mem::swap(&mut some_box_node, &mut self.head);
+        match &mut self.head {
+            Some(ref mut box_node) => (*box_node).next = some_box_node,
+            None => panic!("never occure"),
+        }
+    }
+
+    // pop back
     pub fn pop(&mut self) -> Option<T> {
         let mut some_box_node: &mut Option<Box<Node<T>>> = &mut self.head;
         if let None = some_box_node {
@@ -62,6 +80,21 @@ impl<T> SimpleLinkedList<T> {
                 some_box_node = &mut (*box_node).next
             }
         }
+    }
+
+    pub fn pop_front(&mut self) -> Option<T> {
+        let mut next_some_box_node = None;
+        match &mut self.head {
+            None => return None,            
+            Some(ref mut box_node) => {
+                let node: &mut Node<T> = &mut (*box_node);
+                std::mem::swap(&mut next_some_box_node, &mut node.next);
+            }
+        }
+        let mut result = None;
+        std::mem::swap(&mut self.head, &mut result);
+        self.head = next_some_box_node;
+        Some((*(result.unwrap())).data)
     }
 
     pub fn peek(&self) -> Option<&T> {

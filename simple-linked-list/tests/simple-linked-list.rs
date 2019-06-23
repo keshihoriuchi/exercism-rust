@@ -39,6 +39,18 @@ fn test_pop_returns_last_added_element() {
 }
 
 #[test]
+fn test_pop_front_returns_last_added_element() {
+    let mut list: SimpleLinkedList<u32> = SimpleLinkedList::new();
+    list.push_front(1);
+    list.push_front(2);
+    list.push_front(3);
+    assert_eq!(list.pop_front(), Some(3), "Element must be 3");
+    assert_eq!(list.pop_front(), Some(2), "Element must be 2");
+    assert_eq!(list.pop_front(), Some(1), "Element must be 1");
+    assert_eq!(list.pop_front(), None, "No element should be contained in list");
+}
+
+#[test]
 fn test_peek_returns_head_element() {
     let mut list: SimpleLinkedList<u32> = SimpleLinkedList::new();
     assert_eq!(list.peek(), None, "No element should be contained in list");
