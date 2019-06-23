@@ -1,5 +1,3 @@
-pub use std::boxed::Box;
-
 pub struct SimpleLinkedList<T> {
     head: Option<Box<Node<T>>>,
 }
