@@ -85,7 +85,7 @@ impl<T> SimpleLinkedList<T> {
     pub fn pop_front(&mut self) -> Option<T> {
         let mut next_some_box_node = None;
         match &mut self.head {
-            None => return None,            
+            None => return None,
             Some(ref mut box_node) => {
                 let node: &mut Node<T> = &mut (*box_node);
                 std::mem::swap(&mut next_some_box_node, &mut node.next);
@@ -116,29 +116,29 @@ impl<T> SimpleLinkedList<T> {
 
 impl<T: Clone> SimpleLinkedList<T> {
     pub fn rev(&self) -> SimpleLinkedList<T> {
-        let list: SimpleLinkedList<T> = SimpleLinkedList::new();
-        match &self.head {
-            None => list,
-            Some(box_node) => recur_func_for_rev(box_node, list),
+        let mut list = SimpleLinkedList::new();
+        if let None = &self.head {
+            return list;
         }
-    }
-}
-
-fn recur_func_for_rev<T: Clone>(
-    box_node: &Box<Node<T>>,
-    mut list: SimpleLinkedList<T>,
-) -> SimpleLinkedList<T> {
-    let node = &(*box_node);
-    match &node.next {
-        None => {
-            list.push(node.data.clone());
-            list
+        let mut temp_list: SimpleLinkedList<T> = SimpleLinkedList::new();
+        let mut some_box_node: &Option<Box<Node<T>>> = &self.head;
+        loop {
+            if let Some(box_node) = some_box_node {
+                let node = &(*box_node);
+                temp_list.push(node.data.clone());
+                match &node.next {
+                    None => break,
+                    Some(_) => some_box_node = &node.next 
+                }
+            }
         }
-        Some(next_box_node) => {
-            let mut newlist = recur_func_for_rev(&next_box_node, list);
-            newlist.push(node.data.clone());
-            newlist
+        loop {
+            match temp_list.pop_front() {
+                None => break,
+                Some(v) => list.push_front(v)
+            }
         }
+        list
     }
 }
 
