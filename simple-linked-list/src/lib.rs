@@ -15,32 +15,29 @@ impl<T> SimpleLinkedList<T> {
     }
 
     pub fn len(&self) -> usize {
-        let mut i = 0;
-        let mut n = &self.head;
-        loop {
-            match n {
+        let mut some_box_node = &self.head;
+        for i in 0.. {
+            match some_box_node {
                 None => return i,
-                Some(b) => {
-                    i += 1;
-                    n = &((*b).next)
-                }
+                Some(box_node) => some_box_node = &((*box_node).next),
             }
         }
+        panic!("never here")
     }
 
     pub fn push(&mut self, element: T) {
-        let some_box_node = Some(Box::new(Node {
+        let mut new_some_box_node = Some(Box::new(Node {
             data: element,
             next: None,
         }));
-        match &mut self.head {
-            None => {
-                self.head = some_box_node;
-                return;
-            }
-            Some(ref mut box_node) => {
-                let node: &mut Node<T> = &mut (*box_node);
-                recur_func_for_push_back(node, some_box_node)
+        let mut some_box_node: &mut Option<Box<Node<T>>> = &mut self.head;
+        loop {
+            match some_box_node {
+                None => {
+                    std::mem::swap(&mut new_some_box_node, &mut some_box_node);
+                    return;
+                }
+                Some(ref mut box_node) => some_box_node = &mut (*box_node).next,
             }
         }
     }
@@ -70,13 +67,6 @@ impl<T> SimpleLinkedList<T> {
                 recur_func_for_peek(&node)
             }
         }
-    }
-}
-
-fn recur_func_for_push_back<T>(node: &mut Node<T>, some_box_node: Option<Box<Node<T>>>) {
-    match &mut node.next {
-        None => node.next = some_box_node,
-        Some(ref mut box_node) => recur_func_for_push_back(&mut (*box_node), some_box_node),
     }
 }
 
