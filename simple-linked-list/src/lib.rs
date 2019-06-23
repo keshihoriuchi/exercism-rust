@@ -26,14 +26,14 @@ impl<T> SimpleLinkedList<T> {
     }
 
     pub fn push(&mut self, element: T) {
-        let mut new_some_box_node = Some(Box::new(Node {
-            data: element,
-            next: None,
-        }));
         let mut some_box_node: &mut Option<Box<Node<T>>> = &mut self.head;
         loop {
             match some_box_node {
                 None => {
+                    let mut new_some_box_node = Some(Box::new(Node {
+                        data: element,
+                        next: None,
+                    }));
                     std::mem::swap(&mut new_some_box_node, &mut some_box_node);
                     return;
                 }
@@ -44,10 +44,10 @@ impl<T> SimpleLinkedList<T> {
 
     pub fn pop(&mut self) -> Option<T> {
         let mut some_box_node: &mut Option<Box<Node<T>>> = &mut self.head;
+        if let None = some_box_node {
+            return None;
+        }
         loop {
-            if let None = some_box_node {
-                return None;
-            }
             if let Some(box_node) = some_box_node {
                 if let None = (*box_node).next {
                     let mut result_node = None;
@@ -55,6 +55,9 @@ impl<T> SimpleLinkedList<T> {
                     return Some((*(result_node.unwrap())).data);
                 }
             }
+            // 上のif let式中でmatchでNoneとSomeで分岐させると、
+            // some_box_nodeへの代入でなぜかmut借用エラーになる。
+            // よってここでif let式からやり直す
             if let Some(box_node) = some_box_node {
                 some_box_node = &mut (*box_node).next
             }
@@ -62,20 +65,19 @@ impl<T> SimpleLinkedList<T> {
     }
 
     pub fn peek(&self) -> Option<&T> {
-        match &self.head {
-            None => None,
-            Some(box_node) => {
-                let node: &Node<T> = &(*box_node);
-                recur_func_for_peek(&node)
-            }
+        if let None = &self.head {
+            return None;
         }
-    }
-}
-
-fn recur_func_for_peek<T>(node: &Node<T>) -> Option<&T> {
-    match &node.next {
-        None => Some(&(node.data)),
-        Some(box_node) => recur_func_for_peek(&(*box_node)),
+        let mut some_box_node: &Option<Box<Node<T>>> = &self.head;
+        loop {
+            if let Some(box_node) = some_box_node {
+                let node: &Node<T> = &(*box_node);
+                match node.next {
+                    None => return Some(&node.data),
+                    Some(_) => some_box_node = &node.next,
+                }
+            };
+        }
     }
 }
 
