@@ -82,8 +82,7 @@ impl<T> SimpleLinkedList<T> {
         match &mut self.head {
             None => return None,
             Some(ref mut box_node) => {
-                let node: &mut Node<T> = &mut (*box_node);
-                next_some_box_node = std::mem::replace(&mut node.next, None);
+                next_some_box_node = std::mem::replace(&mut (*box_node).next, None);
             }
         }
         let result = std::mem::replace(&mut self.head, None);
@@ -148,10 +147,9 @@ impl<T> Into<Vec<T>> for SimpleLinkedList<T> {
         loop {
             v.push(n.data);
             match n.next {
-                None => break,
+                None => return v,
                 Some(box_n) => n = *box_n,
             }
         }
-        v
     }
 }
