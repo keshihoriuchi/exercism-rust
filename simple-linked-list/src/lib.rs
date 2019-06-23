@@ -43,18 +43,20 @@ impl<T> SimpleLinkedList<T> {
     }
 
     pub fn pop(&mut self) -> Option<T> {
-        match &mut self.head {
-            None => None,
-            Some(ref mut box_node) => {
-                let node: &mut Node<T> = &mut (*box_node);
-                match node.next {
-                    None => {
-                        let mut result_node = None;
-                        std::mem::swap(&mut result_node, &mut self.head);
-                        Some((*(result_node.unwrap())).data)
-                    }
-                    Some(_) => recur_func_for_pop_back(node),
+        let mut some_box_node: &mut Option<Box<Node<T>>> = &mut self.head;
+        loop {
+            if let None = some_box_node {
+                return None;
+            }
+            if let Some(box_node) = some_box_node {
+                if let None = (*box_node).next {
+                    let mut result_node = None;
+                    std::mem::swap(&mut result_node, &mut some_box_node);
+                    return Some((*(result_node.unwrap())).data);
                 }
+            }
+            if let Some(box_node) = some_box_node {
+                some_box_node = &mut (*box_node).next
             }
         }
     }
@@ -65,23 +67,6 @@ impl<T> SimpleLinkedList<T> {
             Some(box_node) => {
                 let node: &Node<T> = &(*box_node);
                 recur_func_for_peek(&node)
-            }
-        }
-    }
-}
-
-fn recur_func_for_pop_back<T>(node: &mut Node<T>) -> Option<T> {
-    match node.next {
-        None => panic!("node.next never be `None`"),
-        Some(ref mut next_box_node) => {
-            let next_node: &mut Node<T> = &mut (*next_box_node);
-            match next_node.next {
-                None => {
-                    let mut result_node = None;
-                    std::mem::swap(&mut result_node, &mut node.next);
-                    return Some((*(result_node.unwrap())).data);
-                }
-                Some(_) => return recur_func_for_pop_back(next_node),
             }
         }
     }
