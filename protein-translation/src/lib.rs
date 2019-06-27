@@ -1,29 +1,45 @@
-use std::marker::PhantomData;
+use std::collections::HashMap;
 
 pub struct CodonsInfo<'a> {
-    // This field is here to make the template compile and not to
-    // complain about unused type lifetime parameter "'a". Once you start
-    // solving the exercise, delete this field and the 'std::marker::PhantomData'
-    // import.
-    phantom: PhantomData<&'a ()>,
+    codon_proteins: HashMap<&'a str, &'a str>,
 }
 
 impl<'a> CodonsInfo<'a> {
     pub fn name_for(&self, codon: &str) -> Option<&'a str> {
-        unimplemented!(
-            "Return the protein name for a '{}' codon or None, if codon string is invalid",
-            codon
-        );
+        let p = self.codon_proteins.get(codon);
+        match p {
+            None => None,
+            Some(v) => Some(*v),
+        }
     }
 
     pub fn of_rna(&self, rna: &str) -> Option<Vec<&'a str>> {
-        unimplemented!("Return a list of protein names that correspond to the '{}' RNA string or None if the RNA string is invalid", rna);
+        let codons = rna
+            .chars()
+            .collect::<Vec<char>>()
+            .chunks(3)
+            .map(|a| a.into_iter().collect::<String>())
+            .collect::<Vec<String>>();
+        let mut proteins = vec![];
+        for codon in codons {
+            let s :&str = &codon;
+            let protein = self.codon_proteins.get(s);
+            match protein {
+                None => return None,
+                Some(&"stop codon") => break,
+                Some(v) => proteins.push(*v)
+            }
+        }
+        Some(proteins)
     }
 }
 
 pub fn parse<'a>(pairs: Vec<(&'a str, &'a str)>) -> CodonsInfo<'a> {
-    unimplemented!(
-        "Construct a new CodonsInfo struct from given pairs: {:?}",
-        pairs
-    );
+    let mut ci = CodonsInfo {
+        codon_proteins: HashMap::new(),
+    };
+    for (k, v) in pairs {
+        ci.codon_proteins.insert(k, v);
+    }
+    ci
 }

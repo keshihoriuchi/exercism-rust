@@ -10,3 +10,4 @@ https://exercism.io/my/tracks/rust
 4. [minesweeper](./minesweeper/src/lib.rs)
 5. [ocr-numbers](./ocr-numbers/src/lib.rs)
 6. [simple-linked-list](./simple-linked-list/src/lib.rs)
+7. [protein-translation](./protein-translation/src/lib.rs)
