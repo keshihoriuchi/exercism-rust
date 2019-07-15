@@ -9,37 +9,17 @@ pub struct RedBlackTreeSet<T: Ord> {
     head: Option<Box<Node<T>>>,
 }
 
-#[derive(Copy, Clone, PartialEq)]
+#[derive(Copy, Clone, PartialEq, Debug)]
 enum Color {
     Red,
     Black,
 }
-impl std::fmt::Debug for Color {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        if *self == Color::Red {
-            write!(f, "Red")
-        } else {
-            write!(f, "Black")
-        }
-    }
-}
 
-#[derive(Copy, Clone, PartialEq)]
+#[derive(Copy, Clone, PartialEq, Debug)]
 enum Direction {
     Left,
     Right,
     Goal,
-}
-impl std::fmt::Debug for Direction {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        if *self == Direction::Goal {
-            write!(f, "Goal")
-        } else if *self == Direction::Left {
-            write!(f, "Left")
-        } else {
-            write!(f, "Right")
-        }
-    }
 }
 
 struct Node<T: Ord> {
@@ -61,33 +41,29 @@ impl<T: Ord> RedBlackTreeSet<T> {
         }
 
         let mut route: Vec<(Color, Direction)> = vec![];
-        // 葉に挿入
+        // 探索経路を記録しつつ葉に挿入
         {
             let mut some_box_node = &mut self.head;
             loop {
-                match some_box_node {
-                    Some(ref mut box_node) => {
-                        if (*box_node).data == value {
-                            return false;
-                        } else if (*box_node).data > value {
-                            route.push(((*box_node).color, Direction::Left));
-                            if (*box_node).left.is_none() {
-                                (*box_node).left = new_some_box_node(Color::Red, value);
-                                break;
-                            } else {
-                                some_box_node = &mut (*box_node).left;
-                            }
-                        } else {
-                            route.push(((*box_node).color, Direction::Right));
-                            if (*box_node).right.is_none() {
-                                (*box_node).right = new_some_box_node(Color::Red, value);
-                                break;
-                            } else {
-                                some_box_node = &mut (*box_node).right;
-                            }
-                        }
+                let box_node = some_box_node.as_mut().unwrap();
+                if box_node.data == value {
+                    return false;
+                } else if box_node.data > value {
+                    route.push((box_node.color, Direction::Left));
+                    if box_node.left.is_none() {
+                        box_node.left = new_some_box_node(Color::Red, value);
+                        break;
+                    } else {
+                        some_box_node = &mut box_node.left;
                     }
-                    None => panic!(),
+                } else {
+                    route.push((box_node.color, Direction::Right));
+                    if box_node.right.is_none() {
+                        box_node.right = new_some_box_node(Color::Red, value);
+                        break;
+                    } else {
+                        some_box_node = &mut box_node.right;
+                    }
                 }
             }
             route.push((Color::Red, Direction::Goal))
@@ -428,9 +404,9 @@ fn get_some_box_node<'a, T: Ord>(
     for r in route {
         if let Some(box_node) = mref_some_box_node {
             if r.1 == Direction::Left {
-                mref_some_box_node = &mut (*box_node).left;
+                mref_some_box_node = &mut box_node.left;
             } else {
-                mref_some_box_node = &mut (*box_node).right;
+                mref_some_box_node = &mut box_node.right;
             }
         }
     }
