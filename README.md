@@ -11,3 +11,5 @@ https://exercism.io/my/tracks/rust
 5. [ocr-numbers](./ocr-numbers/src/lib.rs)
 6. [simple-linked-list](./simple-linked-list/src/lib.rs)
 7. [protein-translation](./protein-translation/src/lib.rs)
+8. [red-black-tree](./red-black-tree/src/lib.rs)
+9. [grains](./grains/src/lib.rs)
