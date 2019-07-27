@@ -1,3 +1,4 @@
+#![warn(clippy::all)]
 pub fn number(user_number: &str) -> Option<String> {
     let (c, len) = user_number
         .chars()
