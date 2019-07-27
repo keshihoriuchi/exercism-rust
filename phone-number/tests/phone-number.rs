@@ -55,49 +55,41 @@ fn test_invalid_with_punctuations() {
 }
 
 #[test]
-#[ignore]
 fn test_invalid_if_area_code_starts_with_1_on_valid_11digit_number() {
     process_clean_case("1 (123) 456-7890", None);
 }
 
 #[test]
-#[ignore]
 fn test_invalid_if_area_code_starts_with_0_on_valid_11digit_number() {
     process_clean_case("1 (023) 456-7890", None);
 }
 
 #[test]
-#[ignore]
 fn test_invalid_if_area_code_starts_with_1() {
     process_clean_case("(123) 456-7890", None);
 }
 
 #[test]
-#[ignore]
 fn test_invalid_if_exchange_code_starts_with_1() {
     process_clean_case("(223) 156-7890", None);
 }
 
 #[test]
-#[ignore]
 fn test_invalid_if_exchange_code_starts_with_0() {
     process_clean_case("(223) 056-7890", None);
 }
 
 #[test]
-#[ignore]
 fn test_invalid_if_exchange_code_starts_with_1_on_valid_11digit_number() {
     process_clean_case("1 (223) 156-7890", None);
 }
 
 #[test]
-#[ignore]
 fn test_invalid_if_exchange_code_starts_with_0_on_valid_11digit_number() {
     process_clean_case("1 (223) 056-7890", None);
 }
 
 #[test]
-#[ignore]
 fn test_invalid_if_area_code_starts_with_0() {
     process_clean_case("(023) 456-7890", None);
 }
