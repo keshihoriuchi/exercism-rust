@@ -10,12 +10,9 @@ pub fn number(user_number: &str) -> Option<String> {
             }
             _ => (acc, len),
         });
-    if c[0] == '0' || c[0] == '1' || c[3] == '0' || c[3] == '1' {
+    if c[0] == '0' || c[0] == '1' || c[3] == '0' || c[3] == '1' || len != 10 {
         None
-    } else if len == 10 {
-        let s: String = c.iter().collect();
-        Some(s)
     } else {
-        None
+        Some(c.iter().collect())
     }
 }

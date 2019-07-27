@@ -1,7 +1,10 @@
 #![warn(clippy::all)]
 pub fn translate(input: &str) -> String {
-    let vec: Vec<String> = input.split(' ').map(process_word).collect();
-    vec.join(" ")
+    input
+        .split(' ')
+        .map(process_word)
+        .collect::<Vec<String>>()
+        .join(" ")
 }
 
 fn process_word(input: &str) -> String {
@@ -22,23 +25,14 @@ fn process_word(input: &str) -> String {
         i += 1;
     }
     let mut iy = 0;
-    while iy < i {
-        if cvec[iy] == 'y' {
-            break;
-        }
+    while iy < i && cvec[iy] != 'y' {
         iy += 1;
     }
 
     let mut s = String::new();
-    for c in &cvec[i..] {
-        s.push(*c)
-    }
-    for c in &cvec[iy..i] {
-        s.push(*c)
-    }
-    for c in &cvec[..iy] {
-        s.push(*c)
-    }
+    cvec[i..].iter().for_each(|c| s.push(*c));
+    cvec[iy..i].iter().for_each(|c| s.push(*c));
+    cvec[..iy].iter().for_each(|c| s.push(*c));
     s.push_str("ay");
     s
 }
