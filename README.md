@@ -13,3 +13,6 @@ https://exercism.io/my/tracks/rust
 7. [protein-translation](./protein-translation/src/lib.rs)
 8. [red-black-tree](./red-black-tree/src/lib.rs)
 9. [grains](./grains/src/lib.rs)
+10. [phone-number](./phone-number/src/lib.rs)
+11. [anagram](./anagram/src/lib.rs)
+12. [pib-latin](./pig-latin/src/lib.rs)
