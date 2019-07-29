@@ -20,7 +20,7 @@ fn analyze(w: &str) -> HashMap<char, u32> {
     let mut word_map: HashMap<char, u32> = HashMap::new();
     w.chars().for_each(|c| {
         let v = match &word_map.get(&c) {
-            None => 0,
+            None => 1,
             Some(v) => *v + 1,
         };
         word_map.insert(c, v);
