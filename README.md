@@ -15,4 +15,9 @@ https://exercism.io/my/tracks/rust
 9. [grains](./grains/src/lib.rs)
 10. [phone-number](./phone-number/src/lib.rs)
 11. [anagram](./anagram/src/lib.rs)
-12. [pib-latin](./pig-latin/src/lib.rs)
+12. [pig-latin](./pig-latin/src/lib.rs)
+
+## 自由研究
+
+* [wasm-audio](./wasm-audio)
+    * [gh-page](https://keshihoriuchi.github.io/exercism-rust/)
