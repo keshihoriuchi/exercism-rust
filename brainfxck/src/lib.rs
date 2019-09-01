@@ -1,3 +1,5 @@
+#![warn(clippy::all)]
+
 use std::io::Read;
 use std::io::Write;
 
