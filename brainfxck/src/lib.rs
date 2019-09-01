@@ -10,7 +10,7 @@ pub fn brainfxck<T: Read, U: Write>(s: &str, input: &mut T, output: &mut U) {
     let mut pc = 0;
     let src: Vec<char> = s.chars().collect();
     let len = src.len();
-    'w: while pc < len {
+    while pc < len {
         match src[pc] {
             '>' => ptr += 1,
             '<' => ptr -= 1,
@@ -35,7 +35,7 @@ pub fn brainfxck<T: Read, U: Write>(s: &str, input: &mut T, output: &mut U) {
             }
             ']' => {
                 pc = bracket_stack.pop().unwrap();
-                continue 'w;
+                continue;
             }
             _ => {}
         }
