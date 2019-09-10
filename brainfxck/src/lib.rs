@@ -1,4 +1,7 @@
+#![feature(test)]
 #![warn(clippy::all)]
+
+extern crate test;
 
 use std::io::Read;
 use std::io::Write;
@@ -45,6 +48,8 @@ pub fn brainfxck<T: Read, U: Write>(s: &str, input: &mut T, output: &mut U) {
 
 #[cfg(test)]
 mod tests {
+    use test::Bencher;
+
     #[test]
     fn hello_world() {
         let mut v = vec![];
@@ -58,5 +63,21 @@ mod tests {
             &mut v,
         );
         assert_eq!("Hello World!\n", std::str::from_utf8(&v).unwrap());
+    }
+
+    #[bench]
+    fn bench_brainfxck(b: &mut Bencher) {
+        b.iter(|| {
+            let mut v = vec![];
+            super::brainfxck(
+                r#"
+                >+++++++++[<++++++++>-]<.>+++++++[<++++>-]<+.+++++++..+++.[-]>++++++++[<++
+                ++>-]<.>+++++++++++[<+++++>-]<.>++++++++[<+++>-]<.+++.------.--------.[-]>
+                ++++++++[<++++>-]<+.[-]++++++++++.
+            "#,
+                &mut std::io::stdin(),
+                &mut v,
+            );
+        });
     }
 }
