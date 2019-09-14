@@ -18,12 +18,9 @@ enum Command {
     WhileE(usize),
 }
 
-pub fn brainfxck<R: Read, W: Write>(s: &str, input: &mut R, output: &mut W) {
-    let mut buf: [u8; 30000] = [0; 30000];
-    let mut ptr = 1000;
+fn create_commands(src: &[char]) -> Vec<Command> {
+    let len = src.len();
     let mut pc = 0;
-    let src: Vec<char> = s.chars().collect();
-    let mut len = src.len();
     let mut bracket_stack: Vec<usize> = vec![];
     let mut commands: Vec<Command> = vec![];
     while pc < len {
@@ -91,9 +88,17 @@ pub fn brainfxck<R: Read, W: Write>(s: &str, input: &mut R, output: &mut W) {
         }
         pc += 1;
     }
+    commands
+}
 
-    len = commands.len();
-    pc = 0;
+pub fn brainfxck<R: Read, W: Write>(s: &str, input: &mut R, output: &mut W) {
+    let src: Vec<char> = s.chars().collect();
+    let commands = create_commands(&src);
+
+    let len = commands.len();
+    let mut buf: [u8; 30000] = [0; 30000];
+    let mut ptr = 1000;
+    let mut pc = 0;
     while pc < len {
         match commands[pc] {
             Command::RShift(n) => ptr += n,
