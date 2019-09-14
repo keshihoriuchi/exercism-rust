@@ -8,8 +8,8 @@ use std::io::Read;
 use std::io::Write;
 
 enum Command {
-    RShift(usize),
-    LShift(usize),
+    PointR(usize),
+    PointL(usize),
     Inc(u8),
     Dec(u8),
     PutC,
@@ -30,7 +30,7 @@ fn create_commands(src: &[char]) -> Vec<Command> {
                 loop {
                     pc += 1;
                     if src[pc] != '>' {
-                        commands.push(Command::RShift(v));
+                        commands.push(Command::PointR(v));
                         break;
                     }
                     v += 1;
@@ -42,7 +42,7 @@ fn create_commands(src: &[char]) -> Vec<Command> {
                 loop {
                     pc += 1;
                     if src[pc] != '<' {
-                        commands.push(Command::LShift(v));
+                        commands.push(Command::PointL(v));
                         break;
                     }
                     v += 1;
@@ -101,8 +101,8 @@ pub fn brainfxck<R: Read, W: Write>(s: &str, input: &mut R, output: &mut W) {
     let mut pc = 0;
     while pc < len {
         match commands[pc] {
-            Command::RShift(n) => ptr += n,
-            Command::LShift(n) => ptr -= n,
+            Command::PointR(n) => ptr += n,
+            Command::PointL(n) => ptr -= n,
             Command::Inc(n) => buf[ptr] += n,
             Command::Dec(n) => buf[ptr] -= n,
             Command::PutC => {
