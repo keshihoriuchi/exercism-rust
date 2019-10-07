@@ -52,7 +52,6 @@ impl App {
 
             handles.push(thread::spawn(move || {
                 for rq in server.incoming_requests() {
-                    println!("{:?}", rq.url());
                     let mut req = Req {
                         method: rq.method().clone(),
                         path: rq.url().to_string(),
@@ -94,9 +93,21 @@ impl Router {
         }
     }
     pub fn get(&mut self, path: String, mi: RouteHandler) {
+        self.route(tiny_http::Method::Get, path, mi);
+    }
+    pub fn put(&mut self, path: String, mi: RouteHandler) {
+        self.route(tiny_http::Method::Put, path, mi);
+    }
+    pub fn post(&mut self, path: String, mi: RouteHandler) {
+        self.route(tiny_http::Method::Post, path, mi);
+    }
+    pub fn delete(&mut self, path: String, mi: RouteHandler) {
+        self.route(tiny_http::Method::Delete, path, mi);
+    }
+    pub fn route(&mut self, method: tiny_http::Method, path: String, mi: RouteHandler) {
         self.middlewares
             .push(Box::new(move |req: &mut Req, res: &mut Res| {
-                if req.method == tiny_http::Method::Get && req.path == path {
+                if req.method == method && req.path == path {
                     mi(req, res);
                     true
                 } else {
