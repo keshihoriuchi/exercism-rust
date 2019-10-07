@@ -146,4 +146,11 @@ impl Res {
         self.headers
             .push("Content-Type:text/plain; charset=UTF-8".to_string());
     }
+
+    pub fn return_html(&mut self, text: String) {
+        self.status = 200;
+        self.body = text;
+        self.headers
+            .push("Content-Type:text/html; charset=UTF-8".to_string());
+    }
 }
