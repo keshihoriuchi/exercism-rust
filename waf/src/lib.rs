@@ -3,14 +3,14 @@
 extern crate tiny_http;
 use serde::Serialize;
 use std::net::{IpAddr, Ipv4Addr, SocketAddr, ToSocketAddrs};
+use std::str::FromStr;
 use std::sync::Arc;
 use std::thread;
-use std::str::FromStr;
 
 pub struct App {
     addr: SocketAddr,
     num_threads: u8,
-    middlewares: Vec<MiddleWare>
+    middlewares: Vec<MiddleWare>,
 }
 impl App {
     pub fn default() -> Self {
@@ -33,6 +33,12 @@ impl App {
         self.middlewares.push(m);
     }
 
+    pub fn add_router(&mut self, r: Router) {
+        for m in r.middlewares {
+            self.middlewares.push(m);
+        }
+    }
+
     pub fn listen(self) {
         let server = Arc::new(tiny_http::Server::http(self.addr).unwrap());
         println!("Now listening on port {:?}", self.addr.port());
@@ -46,7 +52,11 @@ impl App {
 
             handles.push(thread::spawn(move || {
                 for rq in server.incoming_requests() {
-                    let mut req = Req {};
+                    println!("{:?}", rq.url());
+                    let mut req = Req {
+                        method: rq.method().clone(),
+                        path: rq.url().to_string(),
+                    };
                     let mut res = Res {
                         status: 500,
                         headers: vec![],
@@ -54,7 +64,7 @@ impl App {
                     };
                     let mut iter = middlewares.iter();
                     while let Some(f) = iter.next() {
-                        if !f(&mut req, &mut res) {
+                        if f(&mut req, &mut res) {
                             break;
                         }
                     }
@@ -73,9 +83,37 @@ impl App {
     }
 }
 
-type MiddleWare = Box<dyn Send + Sync + 'static + Fn(&mut Req, &mut Res) -> bool>;
+pub struct Router {
+    middlewares: Vec<MiddleWare>,
+}
 
-pub struct Req {}
+impl Router {
+    pub fn default() -> Self {
+        Router {
+            middlewares: vec![],
+        }
+    }
+    pub fn get(&mut self, path: String, mi: RouteHandler) {
+        self.middlewares
+            .push(Box::new(move |req: &mut Req, res: &mut Res| {
+                if req.method == tiny_http::Method::Get && req.path == path {
+                    mi(req, res);
+                    true
+                } else {
+                    false
+                }
+            }));
+    }
+}
+
+type RouteHandler = Box<dyn Send + Sync + Fn(&mut Req, &mut Res) -> ()>;
+
+type MiddleWare = Box<dyn Send + Sync + Fn(&mut Req, &mut Res) -> bool>;
+
+pub struct Req {
+    method: tiny_http::Method,
+    path: String,
+}
 
 pub struct Res {
     status: u16,
@@ -87,30 +125,14 @@ impl Res {
     pub fn return_json<S: Serialize>(&mut self, obj: S) {
         self.status = 200;
         self.body = serde_json::to_string(&obj).unwrap();
-        self.headers.push("Content-Type:application/json".to_string());
+        self.headers
+            .push("Content-Type:application/json".to_string());
+    }
+
+    pub fn return_text(&mut self, text: String) {
+        self.status = 200;
+        self.body = text;
+        self.headers
+            .push("Content-Type:text/plain; charset=UTF-8".to_string());
     }
 }
-
-// pub fn listen() {
-//     let server = Server::http("0.0.0.0:8000").unwrap();
-
-//     for request in server.incoming_requests() {
-//         println!(
-//             "received request! method: {:?}, url: {:?}, headers: {:?}",
-//             request.method(),
-//             request.url(),
-//             request.headers()
-//         );
-
-//         let response = Response::from_string("hello world");
-//         request.respond(response).unwrap();
-//     }
-// }
-
-// #[cfg(test)]
-// mod tests {
-//     #[test]
-//     fn it_works() {
-//         super::listen();
-//     }
-// }
