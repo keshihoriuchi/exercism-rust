@@ -52,16 +52,12 @@ peg::parser!( grammar json() for str {
         } 
     
     rule member() -> (String, Json)
-        = _ name:string() _ ":" _ value:value() _ {
-            (name.string(), value)
-        }
+        = _ name:string() _ ":" _ value:value() _ { (name.string(), value) }
 
 
     // Array
     rule array() -> Json
-        = _ "[" v:array_value() ** "," _ "]" _ {
-            Json::Array(v)
-        }
+        = _ "[" v:array_value() ** "," _ "]" _ { Json::Array(v) }
 
     rule array_value() -> Json
         = _ v:value() _ { v }
@@ -69,7 +65,7 @@ peg::parser!( grammar json() for str {
 
     // Number
     rule number() -> Json
-        = result:$(("-")? ("0" / ['1'..='9'] ['0'..='9']*) ("." ['0'..='9']+)? (['e' | 'E'] (['-' | '+'])? ['0'..='9']+)?) {
+        = _ result:$(("-")? ("0" / ['1'..='9'] ['0'..='9']*) ("." ['0'..='9']+)? (['e' | 'E'] (['-' | '+'])? ['0'..='9']+)?) _ {
             Json::Number(result.parse().unwrap())
         }
 
@@ -146,7 +142,7 @@ mod tests {
                 Json::Boolean(true)
             ]))
         );
-        assert_eq!(json::value("0"), Ok(Json::Number(0.0)));
+        assert_eq!(json::value("  0 "), Ok(Json::Number(0.0)));
         assert_eq!(json::value("1203"), Ok(Json::Number(1203.0)));
         assert_eq!(json::value("-1203"), Ok(Json::Number(-1203.0)));
     }
