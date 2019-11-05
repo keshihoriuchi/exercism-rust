@@ -1,6 +1,4 @@
-// use std::collections::HashMap;
 use std::collections::BTreeMap;
-use std::str::FromStr;
 
 #[derive(PartialEq, Debug)]
 pub enum Json {
@@ -91,7 +89,7 @@ peg::parser!( grammar json() for str {
           "\\n" { '\n' } /
           "\\r" { '\r' } /
           "\\t" { '\t' } /
-          "\\u" digits:$(['0'..='9' | 'a'..='f']*<4>) { u8::from_str(digits).unwrap() as char }
+          "\\u" digits:$(['0'..='9' | 'a'..='f']*<4>) { u8::from_str_radix(digits, 16).unwrap() as char }
 });
 
 #[cfg(test)]
