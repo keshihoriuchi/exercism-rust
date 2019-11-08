@@ -1,5 +1,9 @@
 use std::collections::BTreeMap;
 
+pub fn parse(s: &str) -> Result<Json, peg::error::ParseError<peg::str::LineCol>> {
+    json::value(s)
+}
+
 #[derive(PartialEq, Debug)]
 pub enum Json {
     Null,
