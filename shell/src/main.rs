@@ -1,3 +1,5 @@
+#![warn(clippy::all)]
+
 use std::fs::File;
 use std::io;
 use std::io::prelude::*;
@@ -41,11 +43,11 @@ peg::parser!( grammar shell_line() for str {
                     }
                 }
             }
-            Cmd { program: String::from(c), args: args, stdin_file: stdin_file, stdout_file: stdout_file}
+            Cmd { program: c, args: args, stdin_file: stdin_file, stdout_file: stdout_file}
         }
 
     rule cmd_without_args() -> Cmd
-        = _ c:unit() _ { Cmd { program: String::from(c), args: vec![], stdin_file: None, stdout_file: None} }
+        = _ c:unit() _ { Cmd { program: c, args: vec![], stdin_file: None, stdout_file: None} }
     
     rule _() = [' ' | '\t']*
     rule __() = [' ' | '\t']+
@@ -200,7 +202,7 @@ fn main() -> Result<(), io::Error> {
         };
 
         // プロセスを起動しない処理
-        if cmds.len() == 0 {
+        if cmds.is_empty() {
             print!("$ ");
             io::stdout().flush()?;
             continue;
@@ -248,11 +250,8 @@ fn main() -> Result<(), io::Error> {
         );
 
         // 末尾のプロセスをウェイト
-        match c {
-            Some(ref mut child) => {
-                child.wait()?;
-            }
-            None => (),
+        if let Some(ref mut child) = c {
+            child.wait()?;
         }
 
         print!("$ ");
