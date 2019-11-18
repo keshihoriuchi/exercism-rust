@@ -4,8 +4,8 @@ use std::process::{Command, Stdio};
 
 #[derive(PartialEq, Debug)]
 pub struct Cmd {
-    program: String,
-    args: Vec<String>,
+    pub program: String,
+    pub args: Vec<String>,
 }
 
 peg::parser!( grammar shell_line() for str {
@@ -84,31 +84,40 @@ mod tests {
     }
 }
 
-fn main() -> Result<(), std::io::Error> {
+fn main() -> Result<(), io::Error> {
     let stdin = io::stdin();
     print!("$ ");
     io::stdout().flush()?;
 
     for line_result in stdin.lock().lines() {
         let line = line_result?;
-        let cmds = shell_line::exec_unit(&line)?;
+        let cmds = match shell_line::exec_unit(&line) {
+            Ok(cmds) => cmds,
+            Err(_) => return Err(io::Error::new(io::ErrorKind::Other, "illegal format"))
+        };
         if cmds.len() == 0 { continue }
 
-        match line {
-            [] => break,
-            Some(cmd) => {
-                let result = Command::new(cmd)
-                    .args(arg_iter.collect::<Vec<&str>>())
-                    .stdout(Stdio::inherit())
-                    .stderr(Stdio::inherit())
-                    .status();
-                match result {
-                    Ok(_status) => (),
-                    Err(err) => println!("{:?}", err),
+        let procs: Vec<std::process::Child> = cmds.iter().enumerate().map(|(i, cmd)| {
+            let stdin = if i == 0 {
+                Stdio::inherit()
+            } else {
+                Stdio::piped()
+            };
+            let stdout = if i == cmds.len() - 1 {
+                Stdio::inherit()
+            } else {
+                Stdio::piped()
+            };
+            let r = Command::new(&cmd.program)
+                .args(&cmd.args).stdin(stdin).stdout(stdout).stderr(Stdio::inherit()).spawn();
+            match r {
+                Ok(child) => child,
+                Err(e) => {
+                    println!("{:?}", e);
+                    panic!();
                 }
             }
-            None => (),
-        }
+        }).collect();
 
         print!("$ ");
         io::stdout().flush()?;
