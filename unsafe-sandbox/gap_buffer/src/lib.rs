@@ -126,10 +126,28 @@ impl<T> GapBuffer<T> {
     }
 }
 
+impl<T> Drop for GapBuffer<T> {
+    fn drop(&mut self) {
+        unsafe {
+            for i in 0 .. self.gap.start {
+                std::ptr::drop_in_place(self.space_mut(i));
+            }
+            for i in self.gap.end .. self.capacity() {
+                std::ptr::drop_in_place(self.space_mut(i));
+            }
+        }
+    }
+}
+
 #[cfg(test)]
 mod tests {
+    use super::GapBuffer;
+
     #[test]
     fn it_works() {
-        assert_eq!(2 + 2, 4);
+        let mut buf = GapBuffer::new();
+        buf.insert_iter("Load of the Rings".chars());
+        buf.set_position(12);
+        buf.insert_iter("Onion ".chars());
     }
 }
