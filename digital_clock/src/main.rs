@@ -1,17 +1,16 @@
-#![no_main]
+// #![no_main]
 #[cfg(windows)]
 extern crate winapi;
-use std::ffi::OsStr;
-use std::io::Error;
-use std::iter::once;
+extern crate chrono;
+
 use std::mem;
-use std::os::raw::{c_char, c_int, c_void};
-use std::os::windows::ffi::OsStrExt;
+// use std::os::raw::{c_char, c_int, c_void};
 use std::ptr::null_mut;
 use winapi::shared::minwindef;
 use winapi::shared::windef;
 use winapi::um::wingdi::*;
 use winapi::um::winuser::*;
+use chrono::prelude::*;
 
 unsafe extern "system" fn win_proc(
     hwnd: windef::HWND,
@@ -28,12 +27,21 @@ unsafe extern "system" fn win_proc(
             PostQuitMessage(0);
             0
         }
+        WM_CREATE => {
+            SetTimer(hwnd, 1, 100, None);
+            0
+        }
+        WM_TIMER => {
+            InvalidateRect(hwnd, null_mut(), minwindef::TRUE);
+            0
+        }
         WM_PAINT => {
             hdc = BeginPaint(hwnd, &mut ps);
             GetClientRect(hwnd, &mut rect);
+            let local: DateTime<Local> = Local::now();
             DrawTextW(
                 hdc,
-                "Sample Text".to_unicode().as_ptr(),
+                local.format("%H:%M:%S").to_string().to_unicode().as_ptr(),
                 -1,
                 &mut rect,
                 DT_WORDBREAK | DT_CENTER,
@@ -45,26 +53,17 @@ unsafe extern "system" fn win_proc(
     }
 }
 
-// #[cfg(windows)]
-// fn print_message(msg: &str) -> Result<i32, Error> {
-//     let wide: Vec<u16> = OsStr::new(msg).encode_wide().chain(once(0)).collect();
-//     let ret = unsafe { MessageBoxW(null_mut(), wide.as_ptr(), wide.as_ptr(), MB_OK) };
-//     if ret == 0 {
-//         Err(Error::last_os_error())
-//     } else {
-//         Ok(ret)
-//     }
-// }
-
-#[allow(non_snake_case)]
-#[no_mangle]
-pub extern "system" fn WinMain(
-    _hInstance: *const c_void,
-    _hPrevInstance: *const c_void,
-    _lpCmdLine: *const c_char,
-    _nCmdShow: c_int,
-) -> c_int {
+// #[allow(non_snake_case)]
+// #[no_mangle]
+// pub extern "system" fn WinMain(
+//     _hInstance: *const c_void,
+//     _hPrevInstance: *const c_void,
+//     _lpCmdLine: *const c_char,
+//     _nCmdShow: c_int,
+// ) -> c_int {
+pub fn main() {
     unsafe {
+        println!("main");
         let class_name = "DIGITALCLOCKCLASS".to_unicode();
         let mut wc = mem::zeroed::<WNDCLASSW>();
         wc.style = CS_HREDRAW | CS_VREDRAW;
@@ -78,7 +77,7 @@ pub extern "system" fn WinMain(
         wc.lpszClassName = class_name.as_ptr();
         RegisterClassW(&wc);
 
-        let hwnd = CreateWindowExW(
+        CreateWindowExW(
             0,
             class_name.as_ptr(),
             "デジタル時計".to_unicode().as_ptr(),
@@ -93,16 +92,15 @@ pub extern "system" fn WinMain(
             null_mut(),
         );
 
-        let mut msg = mem::uninitialized::<MSG>();
+        let mut msg = mem::zeroed::<MSG>();
         loop {
             if GetMessageW(&mut msg, null_mut(), 0, 0) == 0 {
-                return 0;
+                return;
             }
             TranslateMessage(&mut msg);
             DispatchMessageW(&mut msg);
         }
     }
-    // print_message("Hello, world!").unwrap();
 }
 
 trait Helper {
