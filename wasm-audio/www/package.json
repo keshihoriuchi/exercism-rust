@@ -22,7 +22,7 @@
     "hello-wasm-pack": "^0.1.0",
     "wasm-audio": "file:../pkg",
     "webpack": "^4.29.3",
-    "webpack-cli": "^3.1.0",
+    "webpack-cli": "^3.3.12",
     "webpack-dev-server": "^3.1.5"
   },
   "homepage": "https://keshihoriuchi.github.io/exercism-rust"
